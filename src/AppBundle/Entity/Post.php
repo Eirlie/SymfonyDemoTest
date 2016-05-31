@@ -2,20 +2,17 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\PostRepository")
  * @ORM\Table(name="symfony_demo_post")
- *
  * Defines the properties of the Post entity to represent the blog posts.
  * See http://symfony.com/doc/current/book/doctrine.html#creating-an-entity-class
- *
  * Tip: if you have an existing database, you can generate these entity class automatically.
  * See http://symfony.com/doc/current/cookbook/doctrine/reverse_engineering.html
- *
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
@@ -72,6 +69,20 @@ class Post
     private $publishedAt;
 
     /**
+     * @ORM\Column(type="decimal", scale=11, precision=4)
+     * @Assert\NotBlank(message="post.blank_price")
+     * @Assert\Type(type="decimal", message="post.price_decimal")
+     * @Assert\GreaterThanOrEqual(value="0", message="post.non-negative_price")
+     */
+    private $price;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Currency", inversedBy="posts", fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     */
+    private $currency;
+
+    /**
      * @ORM\OneToMany(
      *      targetEntity="Comment",
      *      mappedBy="post",
@@ -122,16 +133,6 @@ class Post
         $this->content = $content;
     }
 
-    public function getAuthorEmail()
-    {
-        return $this->authorEmail;
-    }
-
-    public function setAuthorEmail($authorEmail)
-    {
-        $this->authorEmail = $authorEmail;
-    }
-
     /**
      * Is the given User the author of this Post?
      *
@@ -142,6 +143,16 @@ class Post
     public function isAuthor(User $user)
     {
         return $user->getEmail() === $this->getAuthorEmail();
+    }
+
+    public function getAuthorEmail()
+    {
+        return $this->authorEmail;
+    }
+
+    public function setAuthorEmail($authorEmail)
+    {
+        $this->authorEmail = $authorEmail;
     }
 
     public function getPublishedAt()
@@ -178,5 +189,51 @@ class Post
     public function setSummary($summary)
     {
         $this->summary = $summary;
+    }
+
+    /**
+     * Set price
+     *
+     * @param double $price
+     * @return Post
+     */
+    public function setPrice($price)
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * Get price
+     *
+     * @return double 
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * Set currency
+     *
+     * @param \AppBundle\Entity\Currency $currency
+     * @return Post
+     */
+    public function setCurrency(\AppBundle\Entity\Currency $currency = null)
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
+     * Get currency
+     *
+     * @return \AppBundle\Entity\Currency 
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
     }
 }
