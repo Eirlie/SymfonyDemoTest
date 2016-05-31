@@ -11,13 +11,14 @@
 
 namespace AppBundle\Form;
 
+use AppBundle\Entity\Currency;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Defines the form used to create and manipulate blog posts.
- *
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
@@ -39,20 +40,51 @@ class PostType extends AbstractType
         //     $builder->add('title', null, array('required' => false, ...));
 
         $builder
-            ->add('title', null, array(
-                'attr' => array('autofocus' => true),
-                'label' => 'label.title',
-            ))
-            ->add('summary', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', array('label' => 'label.summary'))
-            ->add('content', null, array(
-                'attr' => array('rows' => 20),
-                'label' => 'label.content',
-            ))
+            ->add(
+                'title',
+                null,
+                array(
+                    'attr'  => array('autofocus' => true),
+                    'label' => 'label.title',
+                )
+            )
+            ->add(
+                'summary',
+                'Symfony\Component\Form\Extension\Core\Type\TextareaType',
+                array('label' => 'label.summary')
+            )
+            ->add(
+                'content',
+                null,
+                array(
+                    'attr'  => array('rows' => 20),
+                    'label' => 'label.content',
+                )
+            )
             ->add('authorEmail', null, array('label' => 'label.author_email'))
-            ->add('publishedAt', 'AppBundle\Form\Type\DateTimePickerType', array(
-                'label' => 'label.published_at',
-            ))
-        ;
+            ->add(
+                'price',
+                null,
+                array(
+                    'label' => 'label.price',
+                )
+            )
+            ->add(
+                'currency',
+                EntityType::class,
+                array(
+                    'label'        => 'label.currency',
+                    'class'        => Currency::class,
+                    'choice_label' => 'name'
+                )
+            )
+            ->add(
+                'publishedAt',
+                'AppBundle\Form\Type\DateTimePickerType',
+                array(
+                    'label' => 'label.published_at',
+                )
+            );
     }
 
     /**
@@ -60,8 +92,10 @@ class PostType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\Post',
-        ));
+        $resolver->setDefaults(
+            array(
+                'data_class' => 'AppBundle\Entity\Post',
+            )
+        );
     }
 }
