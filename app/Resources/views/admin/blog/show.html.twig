@@ -20,6 +20,10 @@
                 <td><p>{{ post.authorEmail }}</p></td>
             </tr>
             <tr>
+                <th>{{ 'label.price'|trans }}</th>
+                <td>{{ post.price }} {{ post.currency.charCode }}</td>
+            </tr>
+            <tr>
                 <th>{{ 'label.published_at'|trans }}</th>
                 <td><p>{{ post.publishedAt|localizeddate('long', 'medium') }}</p></td>
             </tr>
