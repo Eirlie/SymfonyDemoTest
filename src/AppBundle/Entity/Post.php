@@ -71,7 +71,7 @@ class Post
     /**
      * @ORM\Column(type="decimal", scale=11, precision=4)
      * @Assert\NotBlank(message="post.blank_price")
-     * @Assert\Type(type="decimal", message="post.price_decimal")
+     * @Assert\Type(type="double", message="post.price_decimal")
      * @Assert\GreaterThanOrEqual(value="0", message="post.non-negative_price")
      */
     private $price;
