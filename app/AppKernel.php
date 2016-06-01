@@ -25,6 +25,8 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
+            new EightPoints\Bundle\GuzzleBundle\GuzzleBundle(),
+            new JMS\SerializerBundle\JMSSerializerBundle(),
         ];
 
         // Some bundles are only used while developing the application or during

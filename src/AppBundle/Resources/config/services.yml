@@ -1,0 +1,7 @@
+services:
+    app.utils.currency_manager:
+        class: AppBundle\Service\CurrencyManager
+        arguments:
+            - "@guzzle.client.central_bank"
+            - "@jms_serializer.serializer"
+            - "@doctrine.orm.entity_manager"

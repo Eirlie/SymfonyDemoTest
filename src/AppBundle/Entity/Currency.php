@@ -3,7 +3,9 @@
 namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -11,9 +13,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Currency
  * @ORM\Table(name="symfony_demo_currency")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CurrencyRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"numCode"}, message="currency.unique.num_code")
  * @UniqueEntity(fields={"charCode"}, message="currency.unique.char_code")
  * @UniqueEntity(fields={"name"}, message="currency.unique.name")
+ * @Serializer\ExclusionPolicy("all")
+ * @Serializer\XmlRoot("Valute")
  * @author Eldar Shikhbadinov <s.eldar@ideas-world.net>
  */
 class Currency
@@ -31,6 +36,10 @@ class Currency
      * @ORM\Column(name="numCode", type="string", length=3, unique=true)
      * @Assert\Type(type="string", message="currency.num_code.type")
      * @Assert\Regex(pattern="/^\d{3}$/", message="currency.num_code.regex")
+     * @Serializer\Expose()
+     * @Serializer\SerializedName("NumCode")
+     * @Serializer\Type("string")
+     * @Serializer\Accessor(setter="setNumCode")
      */
     private $numCode;
 
@@ -39,6 +48,10 @@ class Currency
      * @ORM\Column(name="charCode", type="string", length=3, unique=true)
      * @Assert\Type(type="string", message="currency.char_code.type")
      * @Assert\Regex(pattern="/^[A-Z]{3}$/", message="currency.char_code.regex")
+     * @Serializer\Expose()
+     * @Serializer\SerializedName("CharCode")
+     * @Serializer\Type("string")
+     * @Serializer\Accessor(setter="setCharCode")
      */
     private $charCode;
 
@@ -47,16 +60,38 @@ class Currency
      * @ORM\Column(name="name", type="string", length=255, unique=true)
      * @Assert\Type(type="string", message="currency.name.type")
      * @Assert\Length(max="255", maxMessage="currency.name.length")
+     * @Serializer\Expose()
+     * @Serializer\SerializedName("Name")
+     * @Serializer\Type("string")
+     * @Serializer\Accessor(setter="setName")
      */
     private $name;
 
     /**
      * @var double
      * @ORM\Column(name="rateToRuble", type="decimal", precision=4, scale=11)
-     * @Assert\Type(type="decimal", message="currency.rate_to_ruble.type")
+     * @Assert\Type(type="double", message="currency.rate_to_ruble.type")
      * @Assert\GreaterThan(value="0", message="currency.rate_to_ruble.grater_than")
      */
     private $rateToRuble;
+
+    /**
+     * @var integer
+     * @Serializer\Expose()
+     * @Serializer\SerializedName("Nominal")
+     * @Serializer\Type("integer")
+     * @Serializer\Accessor(setter="setNominal")
+     */
+    private $nominal;
+    
+    /**
+     * @var double
+     * @Serializer\Expose()
+     * @Serializer\SerializedName("Value")
+     * @Serializer\Type("double")
+     * @Serializer\Accessor(setter="setValue")
+     */
+    private $value;
 
     /**
      * @var bool
@@ -96,10 +131,14 @@ class Currency
 
     /**
      * @param boolean $default
+     *
+     * @return Currency
      */
     public function setDefault($default)
     {
-        $this->default = $default;
+        $this->default = (bool)$default;
+
+        return $this;
     }
 
     /**
@@ -198,7 +237,7 @@ class Currency
      */
     public function setRateToRuble($rateToRuble)
     {
-        $this->rateToRuble = $rateToRuble;
+        $this->rateToRuble = (double)$rateToRuble;
 
         return $this;
     }
@@ -237,16 +276,6 @@ class Currency
     }
 
     /**
-     * Get default
-     *
-     * @return boolean
-     */
-    public function getDefault()
-    {
-        return $this->default;
-    }
-
-    /**
      * Add user
      *
      * @param \AppBundle\Entity\User $user
@@ -272,11 +301,71 @@ class Currency
 
     /**
      * Get users
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getUsers()
     {
         return $this->users;
+    }
+
+    /**
+     * @ORM\PostPersist()
+     * @ORM\PostUpdate()
+     */
+    public function updateIsDefault(LifecycleEventArgs $event)
+    {
+        $currency = $event->getObject();
+        if ($currency->isDefault()) {
+            $event->getEntityManager()->getRepository(Currency::class)->setAsDefault($currency);
+        }
+    }
+
+    protected function updateRateTuRuble()
+    {
+        if (null !== $this->getNominal() && null !== $this->getValue()) {
+            $this->setRateToRuble($this->getValue() / $this->getNominal());
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getNominal()
+    {
+        return $this->nominal;
+    }
+
+    /**
+     * @param int $nominal
+     *
+     * @return Currency
+     */
+    public function setNominal($nominal)
+    {
+        $this->nominal = $nominal;
+        $this->updateRateTuRuble();
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param float $value
+     *
+     * @return Currency
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        $this->updateRateTuRuble();
+
+        return $this;
     }
 }

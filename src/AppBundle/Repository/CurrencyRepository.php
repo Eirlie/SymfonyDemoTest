@@ -73,12 +73,45 @@ class CurrencyRepository extends EntityRepository
             ->getQuery()
             ->execute();
 
-        $currency->setDefault(true);
-        $this->getEntityManager()->persist($currency);
-        $this->getEntityManager()->flush();
+        $this->createQueryBuilder('c')
+            ->update()
+            ->set('c.default', '1')
+            ->where('c=:currency')
+            ->setParameter('currency', $currency)
+            ->getQuery()
+            ->execute();
 
         $this->getEntityManager()->commit();
 
         return $currency;
+    }
+
+    public function saveCurrency(Currency $currency)
+    {
+        $this->getEntityManager()
+            ->createQueryBuilder()
+            ->delete($this->getClassName(), 'c')
+            ->where('c.charCode=:charCode OR c.numCode=:numCode')
+            ->andWhere('c.name<>:name')
+            ->setParameters(
+                [
+                    'charCode' => $currency->getCharCode(),
+                    'numCode'  => $currency->getNumCode(),
+                    'name'     => $currency->getName()
+                ]
+            )
+            ->getQuery()
+            ->execute();
+
+        $oldCurrency = $this->findOneBy(['name' => $currency->getName()]);
+        if (null !== $oldCurrency) {
+            $oldCurrency->setRateToRuble($currency->getRateToRuble());
+            $oldCurrency->setNumCode($currency->getNumCode());
+            $oldCurrency->setCharCode($currency->getCharCode());
+        } else {
+            $this->getEntityManager()->persist($currency);
+        }
+
+        $this->getEntityManager()->flush();
     }
 }
