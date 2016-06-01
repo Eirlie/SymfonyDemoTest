@@ -11,9 +11,10 @@
 
 namespace AppBundle\DataFixtures\ORM;
 
-use AppBundle\Entity\User;
-use AppBundle\Entity\Post;
 use AppBundle\Entity\Comment;
+use AppBundle\Entity\Currency;
+use AppBundle\Entity\Post;
+use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -22,11 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines the sample data to load in the database when running the unit and
  * functional tests. Execute this command to load the data:
- *
  *   $ php app/console doctrine:fixtures:load
- *
  * See http://symfony.com/doc/current/bundles/DoctrineFixturesBundle/index.html
- *
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
@@ -41,6 +39,7 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         $this->loadUsers($manager);
+        $this->loadCurrencies($manager);
         $this->loadPosts($manager);
     }
 
@@ -58,10 +57,27 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
         $annaAdmin = new User();
         $annaAdmin->setUsername('anna_admin');
         $annaAdmin->setEmail('anna_admin@symfony.com');
-        $annaAdmin->setRoles(array('ROLE_ADMIN'));
+        $annaAdmin->setRoles(['ROLE_ADMIN']);
         $encodedPassword = $passwordEncoder->encodePassword($annaAdmin, 'kitten');
         $annaAdmin->setPassword($encodedPassword);
         $manager->persist($annaAdmin);
+
+        $manager->flush();
+    }
+
+    /**
+     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     *
+     * @author Eldar Shikhbadinov <s.eldar@ideas-world.net>
+     */
+    private function loadCurrencies(ObjectManager $manager)
+    {
+        $ruble = new Currency();
+        $ruble->setNumCode(810);
+        $ruble->setCharCode('RUR');
+        $ruble->setName('Российский рубль');
+        $ruble->setRateToRuble(1);
+        $manager->persist($ruble);
 
         $manager->flush();
     }
@@ -76,13 +92,15 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
             $post->setSlug($this->container->get('slugger')->slugify($post->getTitle()));
             $post->setContent($this->getPostContent());
             $post->setAuthorEmail('anna_admin@symfony.com');
-            $post->setPublishedAt(new \DateTime('now - '.$i.'days'));
+            $post->setPublishedAt(new \DateTime('now - ' . $i . 'days'));
+            $post->setPrice(1);
+            $post->setCurrency($manager->getRepository(Currency::class)->findOneBy(['charCode' => 'RUR']));
 
             foreach (range(1, 5) as $j) {
                 $comment = new Comment();
 
                 $comment->setAuthorEmail('john_user@symfony.com');
-                $comment->setPublishedAt(new \DateTime('now + '.($i + $j).'seconds'));
+                $comment->setPublishedAt(new \DateTime('now + ' . ($i + $j) . 'seconds'));
                 $comment->setContent($this->getRandomCommentContent());
                 $comment->setPost($post);
 
@@ -96,12 +114,42 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    private function getRandomPostTitle()
     {
-        $this->container = $container;
+        $titles = $this->getPhrases();
+
+        return $titles[array_rand($titles)];
+    }
+
+    private function getPhrases()
+    {
+        return [
+            'Lorem ipsum dolor sit amet consectetur adipiscing elit',
+            'Pellentesque vitae velit ex',
+            'Mauris dapibus risus quis suscipit vulputate',
+            'Eros diam egestas libero eu vulputate risus',
+            'In hac habitasse platea dictumst',
+            'Morbi tempus commodo mattis',
+            'Ut suscipit posuere justo at vulputate',
+            'Ut eleifend mauris et risus ultrices egestas',
+            'Aliquam sodales odio id eleifend tristique',
+            'Urna nisl sollicitudin id varius orci quam id turpis',
+            'Nulla porta lobortis ligula vel egestas',
+            'Curabitur aliquam euismod dolor non ornare',
+            'Sed varius a risus eget aliquam',
+            'Nunc viverra elit ac laoreet suscipit',
+            'Pellentesque et sapien pulvinar consectetur',
+        ];
+    }
+
+    private function getRandomPostSummary($maxLength = 255)
+    {
+        $phrases = $this->getPhrases();
+
+        $numPhrases = mt_rand(6, 12);
+        shuffle($phrases);
+
+        return substr(implode(' ', array_slice($phrases, 0, $numPhrases - 1)), 0, $maxLength);
     }
 
     private function getPostContent()
@@ -144,44 +192,6 @@ tincidunt, faucibus nisl in, aliquet libero.
 MARKDOWN;
     }
 
-    private function getPhrases()
-    {
-        return array(
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit',
-            'Pellentesque vitae velit ex',
-            'Mauris dapibus risus quis suscipit vulputate',
-            'Eros diam egestas libero eu vulputate risus',
-            'In hac habitasse platea dictumst',
-            'Morbi tempus commodo mattis',
-            'Ut suscipit posuere justo at vulputate',
-            'Ut eleifend mauris et risus ultrices egestas',
-            'Aliquam sodales odio id eleifend tristique',
-            'Urna nisl sollicitudin id varius orci quam id turpis',
-            'Nulla porta lobortis ligula vel egestas',
-            'Curabitur aliquam euismod dolor non ornare',
-            'Sed varius a risus eget aliquam',
-            'Nunc viverra elit ac laoreet suscipit',
-            'Pellentesque et sapien pulvinar consectetur',
-        );
-    }
-
-    private function getRandomPostTitle()
-    {
-        $titles = $this->getPhrases();
-
-        return $titles[array_rand($titles)];
-    }
-
-    private function getRandomPostSummary($maxLength = 255)
-    {
-        $phrases = $this->getPhrases();
-
-        $numPhrases = mt_rand(6, 12);
-        shuffle($phrases);
-
-        return substr(implode(' ', array_slice($phrases, 0, $numPhrases-1)), 0, $maxLength);
-    }
-
     private function getRandomCommentContent()
     {
         $phrases = $this->getPhrases();
@@ -189,6 +199,14 @@ MARKDOWN;
         $numPhrases = mt_rand(2, 15);
         shuffle($phrases);
 
-        return implode(' ', array_slice($phrases, 0, $numPhrases-1));
+        return implode(' ', array_slice($phrases, 0, $numPhrases - 1));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
     }
 }

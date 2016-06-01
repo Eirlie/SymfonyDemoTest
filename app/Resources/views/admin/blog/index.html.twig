@@ -10,6 +10,7 @@
             <tr>
                 <th>{{ 'label.title'|trans }}</th>
                 <th><i class="fa fa-user"></i> {{ 'label.author'|trans }}</th>
+                <th>{{ 'label.price'|trans }}</th>
                 <th><i class="fa fa-calendar"></i> {{ 'label.published_at'|trans }}</th>
                 <th><i class="fa fa-cogs"></i> {{ 'label.actions'|trans }}</th>
             </tr>
@@ -19,6 +20,7 @@
             <tr>
                 <td>{{ post.title }}</td>
                 <td>{{ post.authorEmail }}</td>
+                <td align="center">{{ post.price }}</td>
                 <td>{% if post.publishedAt %}{{ post.publishedAt|localizeddate('short', 'short') }}{% endif %}</td>
                 <td>
                     <div class="item-actions">

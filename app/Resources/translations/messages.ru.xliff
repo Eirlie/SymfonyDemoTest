@@ -186,6 +186,14 @@
                 <source>label.author_email</source>
                 <target>Email автора</target>
             </trans-unit>
+            <trans-unit id="label.price">
+                <source>label.price</source>
+                <target>Стоимость</target>
+            </trans-unit>
+            <trans-unit id="label.currency">
+                <source>label.currency</source>
+                <target>Валюта</target>
+            </trans-unit>
             <trans-unit id="label.username">
                 <source>label.username</source>
                 <target>Логин</target>
@@ -275,6 +283,10 @@
             <trans-unit id="post.deleted_successfully">
                 <source>post.deleted_successfully</source>
                 <target>Запись успешно удалена!</target>
+            </trans-unit>
+            <trans-unit id="post.price">
+                <source>post.price</source>
+                <target>Стоимость: %price% %currency_char_code%</target>
             </trans-unit>
 
             <trans-unit id="help.app_description">
