@@ -22,6 +22,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.twig.boolean_to_string_extension:
+        public: false
+        class: AppBundle\Twig\BooleanToStringExtension
+        arguments: ['@translator']
+        tags:
+            - { name: twig.extension }
+
     app.twig.price_converter_extension:
         public: false
         class: AppBundle\Twig\PriceConverterExtension
