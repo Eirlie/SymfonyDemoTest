@@ -1,0 +1,41 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_currency_index' %}
+
+{% block main %}
+    <h1>{{ 'title.currency_list'|trans }}</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>{{ 'label.currency.num_code'|trans }}</th>
+                <th>{{ 'label.currency.char_code'|trans }}</th>
+                <th>{{ 'label.currency.name'|trans }}</th>
+                <th>{{ 'label.currency.rate_to_ruble'|trans }}</th>
+                <th>{{ 'label.is_default'|trans }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for currency in currencies %}
+                <tr>
+                    <td align="center">{{ currency.numCode }}</td>
+                    <td align="center">{{ currency.charCode }}</td>
+                    <td align="center">{{ currency.name }}</td>
+                    <td align="center">{{ currency.rateToRuble }}</td>
+                    <td align="center">{{ currency.isDefault|bool2string }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" align="center">{{ 'currency.no_currencies_found'|trans }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block sidebar %}
+
+    {{ parent() }}
+
+    {{ show_source_code(_self) }}
+{% endblock %}
