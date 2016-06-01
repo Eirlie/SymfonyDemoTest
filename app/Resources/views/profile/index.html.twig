@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block body_id 'profile_index' %}
+
+{% block main %}
+    <h1>{{ user.username }}</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>{{ 'label.email'|trans }}</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'label.default_currency'|trans }}</th>
+                <td>{{ user.defaultCurrency.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="section">
+        <a href="{{ path('profile_edit') }}" class="btn btn-lg btn-block btn-success">
+            <i class="fa fa-edit"></i> {{ 'action.edit_profile'|trans }}
+        </a>
+    </div>
+
+    {{ show_source_code(_self) }}
+{% endblock %}
