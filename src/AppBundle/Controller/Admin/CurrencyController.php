@@ -8,6 +8,7 @@ namespace AppBundle\Controller\Admin;
 
 
 use AppBundle\Entity\Currency;
+use AppBundle\Exception\CurrencyImportResponseException;
 use AppBundle\Form\CurrencyType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -185,8 +186,12 @@ class CurrencyController extends Controller
      */
     public function importAction()
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        //TODO implement import
+        $currencyManager = $this->get('app.utils.currency_manager');
+        try {
+            $currencyManager->import();
+        } catch (CurrencyImportResponseException $e) {
+            $this->addFlash('error', 'currency.import_failed');
+        }
         return $this->redirectToRoute('admin_currency_index');
     }
 }
