@@ -1,0 +1,47 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_currency_show' %}
+
+{% block main %}
+    <h1>{{ currency.name }}</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>{{ 'label.currency.num_code'|trans }}</th>
+                <td>{{ currency.numCode }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'label.currency.char_code'|trans }}</th>
+                <td><p>{{ currency.charCode }}</p></td>
+            </tr>
+            <tr>
+                <th>{{ 'label.currency.rate_to_ruble'|trans }}</th>
+                <td>{{ currency.rateToRuble }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'label.is_default'|trans }}</th>
+                <td><p>{{ currency.isDefault|bool2string }}</p></td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="section">
+        <a href="{{ path('admin_currency_edit', { id: currency.id }) }}" class="btn btn-lg btn-block btn-success">
+            <i class="fa fa-edit"></i> {{ 'action.edit_contents'|trans }}
+        </a>
+    </div>
+
+    <div class="section">
+        {{ include('admin/blog/_form.html.twig', {
+            form: delete_form,
+            button_label: 'action.delete_currency'|trans,
+            button_css: 'btn btn-lg btn-block btn-danger',
+            show_confirmation: true,
+        }, with_context = false) }}
+    </div>
+
+    {{ show_source_code(_self) }}
+{% endblock %}

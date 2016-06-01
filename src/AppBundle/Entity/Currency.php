@@ -53,7 +53,7 @@ class Currency
     /**
      * @var double
      * @ORM\Column(name="rateToRuble", type="decimal", precision=4, scale=11)
-     * @Assert\Type(type="decimal", message="currency.rate_to_ruble.type")
+     * @Assert\Type(type="double", message="currency.rate_to_ruble.type")
      * @Assert\GreaterThan(value="0", message="currency.rate_to_ruble.grater_than")
      */
     private $rateToRuble;
@@ -99,7 +99,7 @@ class Currency
      */
     public function setDefault($default)
     {
-        $this->default = $default;
+        $this->default = (bool)$default;
     }
 
     /**
@@ -198,7 +198,7 @@ class Currency
      */
     public function setRateToRuble($rateToRuble)
     {
-        $this->rateToRuble = $rateToRuble;
+        $this->rateToRuble = (double)$rateToRuble;
 
         return $this;
     }
@@ -234,16 +234,6 @@ class Currency
     public function getPosts()
     {
         return $this->posts;
-    }
-
-    /**
-     * Get default
-     *
-     * @return boolean
-     */
-    public function getDefault()
-    {
-        return $this->default;
     }
 
     /**
