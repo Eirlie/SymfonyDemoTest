@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -11,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Currency
  * @ORM\Table(name="symfony_demo_currency")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CurrencyRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"numCode"}, message="currency.unique.num_code")
  * @UniqueEntity(fields={"charCode"}, message="currency.unique.char_code")
  * @UniqueEntity(fields={"name"}, message="currency.unique.name")
@@ -262,11 +264,22 @@ class Currency
 
     /**
      * Get users
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getUsers()
     {
         return $this->users;
+    }
+
+    /**
+     * @ORM\PostPersist()
+     * @ORM\PostUpdate()
+     */
+    public function updateIsDefault(LifecycleEventArgs $event)
+    {
+        $currency = $event->getObject();
+        if ($currency->isDefault()) {
+            $event->getEntityManager()->getRepository(Currency::class)->setAsDefault($currency);
+        }
     }
 }

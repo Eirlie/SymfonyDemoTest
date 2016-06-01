@@ -73,9 +73,13 @@ class CurrencyRepository extends EntityRepository
             ->getQuery()
             ->execute();
 
-        $currency->setDefault(true);
-        $this->getEntityManager()->persist($currency);
-        $this->getEntityManager()->flush();
+        $this->createQueryBuilder('c')
+            ->update()
+            ->set('c.default', '1')
+            ->where('c=:currency')
+            ->setParameter('currency', $currency)
+            ->getQuery()
+            ->execute();
 
         $this->getEntityManager()->commit();
 
