@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -58,11 +59,48 @@ class Currency
     private $rateToRuble;
 
     /**
+     * @var bool
+     * @ORM\Column(name="isDefault", type="boolean", options={"default":0})
+     * @Assert\Type(type="boolean", message="currency.default.type")
+     */
+    private $default = false;
+
+    /**
      * @var Post[]
-     * @ORM\OneToMany(targetEntity="Post", mappedBy="currency", orphanRemoval=true, fetch="EXTRA_LAZY")     *
+     * @ORM\OneToMany(targetEntity="Post", mappedBy="currency", orphanRemoval=true, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"publishedAt" = "DESC"})
      */
     private $posts;
+
+    /**
+     * @var Collection<User>
+     * @ORM\OneToMany(targetEntity="User", mappedBy="defaultCurrency", orphanRemoval=false, fetch="EXTRA_LAZY")
+     */
+    private $users;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->posts = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->default;
+    }
+
+    /**
+     * @param boolean $default
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
+    }
 
     /**
      * Get id
@@ -164,18 +202,12 @@ class Currency
 
         return $this;
     }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->posts = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     /**
      * Add posts
      *
      * @param \AppBundle\Entity\Post $posts
+     *
      * @return Currency
      */
     public function addPost(\AppBundle\Entity\Post $posts)
@@ -197,11 +229,54 @@ class Currency
 
     /**
      * Get posts
-     *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getPosts()
     {
         return $this->posts;
+    }
+
+    /**
+     * Get default
+     *
+     * @return boolean
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    /**
+     * Add user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Currency
+     */
+    public function addUser(\AppBundle\Entity\User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param \AppBundle\Entity\User $user
+     */
+    public function removeUser(\AppBundle\Entity\User $user)
+    {
+        $this->users->removeElement($user);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }
