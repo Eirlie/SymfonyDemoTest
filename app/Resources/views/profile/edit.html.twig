@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body_id 'profile_edit' %}
+
+{% block main %}
+    <h1>{{ 'title.edit_profile'|trans }}</h1>
+
+    {{ include('profile/_form.html.twig', {
+        form: edit_form,
+        button_label: 'action.save'|trans,
+        include_back_to_home_link: true,
+    }, with_context = false) }}
+{% endblock %}
+
+{% block sidebar %}
+    {{ parent() }}
+
+    {{ show_source_code(_self) }}
+{% endblock %}

@@ -7,7 +7,12 @@
 
     {{ post.content|md2html }}
 
-    <h3>{{ 'post.price'|trans({'%price%': post.price, '%currency_char_code%': post.currency.charCode}) }}</h3>
+    <h3>{{ 'label.price'|trans }}</h3>
+    <h4>{{ post.price }} {{ post.currency.charCode }}</h4>
+    {% if null != defaultCurrency and post.currency != defaultCurrency %}
+        <h4>~{{ post.price|price(post.currency, defaultCurrency) }} {{ defaultCurrency.charCode }}</h4>
+    {% endif %}
+
 
     <div id="post-add-comment" class="well">
         {# The 'IS_AUTHENTICATED_FULLY' role ensures that the user has entered

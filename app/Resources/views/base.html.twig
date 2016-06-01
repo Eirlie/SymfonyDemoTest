@@ -57,6 +57,14 @@
                                         </a>
                                     </li>
 
+                                    {% if is_granted('ROLE_USER') %}
+                                        <li>
+                                            <a href="{{ path('profile_index') }}">
+                                                <i class="fa fa-user"></i> {{ 'menu.profile'|trans }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+
                                     {% if is_granted('ROLE_ADMIN') %}
                                         <li>
                                             <a href="{{ path('admin_post_index') }}">

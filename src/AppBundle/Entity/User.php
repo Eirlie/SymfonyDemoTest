@@ -8,13 +8,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="symfony_demo_user")
- *
  * Defines the properties of the User entity to represent the application users.
  * See http://symfony.com/doc/current/book/doctrine.html#creating-an-entity-class
- *
  * Tip: if you have an existing database, you can generate these entity class automatically.
  * See http://symfony.com/doc/current/cookbook/doctrine/reverse_engineering.html
- *
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
@@ -43,6 +40,12 @@ class User implements UserInterface
     private $password;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Currency", fetch="LAZY", inversedBy="users")
+     * @ORM\JoinColumn(name="defaultCurrency", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $defaultCurrency;
+
+    /**
      * @ORM\Column(type="json_array")
      */
     private $roles = array();
@@ -59,6 +62,7 @@ class User implements UserInterface
     {
         return $this->username;
     }
+
     public function setUsername($username)
     {
         $this->username = $username;
@@ -68,6 +72,7 @@ class User implements UserInterface
     {
         return $this->email;
     }
+
     public function setEmail($email)
     {
         $this->email = $email;
@@ -80,6 +85,7 @@ class User implements UserInterface
     {
         return $this->password;
     }
+
     public function setPassword($password)
     {
         $this->password = $password;
@@ -124,5 +130,29 @@ class User implements UserInterface
     {
         // if you had a plainPassword property, you'd nullify it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * Set defaultCurrency
+     *
+     * @param \AppBundle\Entity\Currency $defaultCurrency
+     *
+     * @return User
+     */
+    public function setDefaultCurrency(\AppBundle\Entity\Currency $defaultCurrency = null)
+    {
+        $this->defaultCurrency = $defaultCurrency;
+
+        return $this;
+    }
+
+    /**
+     * Get defaultCurrency
+     *
+     * @return \AppBundle\Entity\Currency
+     */
+    public function getDefaultCurrency()
+    {
+        return $this->defaultCurrency;
     }
 }

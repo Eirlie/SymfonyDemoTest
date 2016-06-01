@@ -9,9 +9,9 @@ services:
 
     # These are the Twig extensions that create new filters and functions for
     # using them in the templates
-    app.twig.app_extension:
+    app.twig.markdown_to_html_extension:
         public:    false
-        class:     AppBundle\Twig\AppExtension
+        class:     AppBundle\Twig\MarkdownToHtmlExtension
         arguments: ['@markdown', '%app_locales%']
         tags:
             - { name: twig.extension }
@@ -19,6 +19,12 @@ services:
     app.twig.intl_extension:
         public: false
         class:  Twig_Extensions_Extension_Intl
+        tags:
+            - { name: twig.extension }
+
+    app.twig.price_converter_extension:
+        public: false
+        class: AppBundle\Twig\PriceConverterExtension
         tags:
             - { name: twig.extension }
 
