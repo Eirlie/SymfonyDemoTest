@@ -58,12 +58,10 @@ class BlogController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
 
         $user = $this->getUser();
-        $defaultCurrency = null;
-        if ($user instanceof User) {
-            $defaultCurrency = (null !== $user->getDefaultCurrency())
-                ? $user->getDefaultCurrency()
-                : $em->getRepository(Currency::class)->getDefaultCurrency();
-        }
+        $defaultCurrency = ($user instanceof User && null !== $user->getDefaultCurrency())
+            ? $user->getDefaultCurrency()
+            : $em->getRepository(Currency::class)->getDefaultCurrency();
+
 
         return $this->render('blog/post_show.html.twig', array('post' => $post, 'defaultCurrency' => $defaultCurrency));
     }
