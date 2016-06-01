@@ -12,7 +12,9 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Comment;
+use AppBundle\Entity\Currency;
 use AppBundle\Entity\Post;
+use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -24,9 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller used to manage blog contents in the public part of the site.
- *
  * @Route("/blog")
- *
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
@@ -48,7 +48,6 @@ class BlogController extends Controller
     /**
      * @Route("/posts/{slug}", name="blog_post")
      * @Method("GET")
-     *
      * NOTE: The $post controller argument is automatically injected by Symfony
      * after performing a database query looking for a Post with the 'slug'
      * value given in the route.
@@ -56,7 +55,17 @@ class BlogController extends Controller
      */
     public function postShowAction(Post $post)
     {
-        return $this->render('blog/post_show.html.twig', array('post' => $post));
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $user = $this->getUser();
+        $defaultCurrency = null;
+        if ($user instanceof User) {
+            $defaultCurrency = (null !== $user->getDefaultCurrency())
+                ? $user->getDefaultCurrency()
+                : $em->getRepository(Currency::class)->getDefaultCurrency();
+        }
+
+        return $this->render('blog/post_show.html.twig', array('post' => $post, 'defaultCurrency' => $defaultCurrency));
     }
 
     /**
@@ -64,10 +73,10 @@ class BlogController extends Controller
      * @Method("POST")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      * @ParamConverter("post", options={"mapping": {"postSlug": "slug"}})
-     *
      * NOTE: The ParamConverter mapping is required because the route parameter
      * (postSlug) doesn't match any of the Doctrine entity properties (slug).
-     * See http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html#doctrine-converter
+     * See
+     * http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html#doctrine-converter
      */
     public function commentNewAction(Request $request, Post $post)
     {
@@ -88,17 +97,19 @@ class BlogController extends Controller
             return $this->redirectToRoute('blog_post', array('slug' => $post->getSlug()));
         }
 
-        return $this->render('blog/comment_form_error.html.twig', array(
-            'post' => $post,
-            'form' => $form->createView(),
-        ));
+        return $this->render(
+            'blog/comment_form_error.html.twig',
+            array(
+                'post' => $post,
+                'form' => $form->createView(),
+            )
+        );
     }
 
     /**
      * This controller is called directly via the render() function in the
      * blog/post_show.html.twig template. That's why it's not needed to define
      * a route name for it.
-     *
      * The "id" of the Post is passed in and then turned into a Post object
      * automatically by the ParamConverter.
      *
@@ -110,9 +121,12 @@ class BlogController extends Controller
     {
         $form = $this->createForm('AppBundle\Form\CommentType');
 
-        return $this->render('blog/_comment_form.html.twig', array(
-            'post' => $post,
-            'form' => $form->createView(),
-        ));
+        return $this->render(
+            'blog/_comment_form.html.twig',
+            array(
+                'post' => $post,
+                'form' => $form->createView(),
+            )
+        );
     }
 }

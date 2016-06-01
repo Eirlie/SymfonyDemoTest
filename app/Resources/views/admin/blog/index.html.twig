@@ -20,7 +20,7 @@
             <tr>
                 <td>{{ post.title }}</td>
                 <td>{{ post.authorEmail }}</td>
-                <td align="center">{{ post.price }}</td>
+                <td align="center">{{ post.price }} {{ post.currency.charCode }}</td>
                 <td>{% if post.publishedAt %}{{ post.publishedAt|localizeddate('short', 'short') }}{% endif %}</td>
                 <td>
                     <div class="item-actions">
