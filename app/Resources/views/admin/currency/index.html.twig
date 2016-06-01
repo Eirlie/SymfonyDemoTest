@@ -49,6 +49,15 @@
 
 {% block sidebar %}
     <div class="section actions">
+        <div class="section">
+            {{ include('admin/currency/_form.html.twig', {
+                form: import_form,
+                button_label: 'action.import_currency'|trans,
+                button_css: 'btn btn-lg btn-block btn-success',
+                show_confirmation: true,
+                confirmationTemplate: 'admin/currency/_import_currency_confirmation.html.twig'
+            }, with_context = false) }}
+        </div>
         <a href="{{ path('admin_currency_new') }}" class="btn btn-lg btn-block btn-success">
             <i class="fa fa-plus"></i> {{ 'action.create_currency'|trans }}
         </a>

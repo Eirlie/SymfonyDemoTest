@@ -32,8 +32,27 @@ class CurrencyController extends Controller
     {
         $entityManager = $this->getDoctrine()->getManager();
         $currencies = $entityManager->getRepository(Currency::class)->findAll();
+        $importForm = $this->createImportForm();
 
-        return $this->render('admin/currency/index.html.twig', array('currencies' => $currencies));
+        return $this->render(
+            'admin/currency/index.html.twig',
+            array(
+                'currencies'  => $currencies,
+                'import_form' => $importForm->createView()
+            )
+        );
+    }
+
+    /**
+     * Creates a form to import currencies from external service.
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createImportForm()
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('admin_currency_import'))
+            ->setMethod('POST')
+            ->getForm();
     }
 
     /**
@@ -157,5 +176,17 @@ class CurrencyController extends Controller
                 'delete_form' => $deleteForm->createView(),
             )
         );
+    }
+
+    /**
+     * Import currencies from The Central Bank of the Russian Federation API.
+     * @Route("/import", name="admin_currency_import")
+     * @Method("POST")
+     */
+    public function importAction()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        //TODO implement import
+        return $this->redirectToRoute('admin_currency_index');
     }
 }

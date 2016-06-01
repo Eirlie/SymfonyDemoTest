@@ -35,11 +35,12 @@
     </div>
 
     <div class="section">
-        {{ include('admin/blog/_form.html.twig', {
+        {{ include('admin/currency/_form.html.twig', {
             form: delete_form,
             button_label: 'action.delete_currency'|trans,
             button_css: 'btn btn-lg btn-block btn-danger',
             show_confirmation: true,
+            confirmationTemplate: 'admin/currency/_delete_currency_confirmation.html.twig'
         }, with_context = false) }}
     </div>
 
