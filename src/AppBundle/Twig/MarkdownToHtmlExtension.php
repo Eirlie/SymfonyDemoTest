@@ -26,7 +26,7 @@ use Symfony\Component\Intl\Intl;
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  * @author Julien ITARD <julienitard@gmail.com>
  */
-class AppExtension extends \Twig_Extension
+class MarkdownToHtmlExtension extends \Twig_Extension
 {
     /**
      * @var Markdown
@@ -102,6 +102,6 @@ class AppExtension extends \Twig_Extension
     {
         // the name of the Twig extension must be unique in the application. Consider
         // using 'app.extension' if you only have one Twig extension in your application.
-        return 'app.extension';
+        return 'app.extension.md2html';
     }
 }
